@@ -4,6 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\CheckRole;
+use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -13,10 +14,16 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // Allow cookies for API (if using Sanctum)
+        // Enable stateful API support for Sanctum (cookies + tokens)
         $middleware->statefulApi();
 
-        // Register your custom alias
+        // 🔒 Add Sanctum's authentication middleware to the API group
+        $middleware->group('api', [
+            EnsureFrontendRequestsAreStateful::class,
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        ]);
+
+        // ✅ Register custom middleware aliases
         $middleware->alias([
             'role' => CheckRole::class,
         ]);

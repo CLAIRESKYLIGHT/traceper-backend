@@ -14,8 +14,10 @@ return new class extends Migration
         Schema::create('documents', function (Blueprint $table) {
             $table->id();
             $table->foreignId('project_id')->constrained()->onDelete('cascade');
-            $table->string('document_type')->nullable();
-            $table->string('file_path');
+            $table->string('title');
+            $table->string('file_path'); // stored file location
+            $table->string('type')->nullable(); // e.g., contract, report, receipt
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }

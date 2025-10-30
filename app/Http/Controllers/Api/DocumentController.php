@@ -9,6 +9,13 @@ use Illuminate\Support\Facades\Storage;
 
 class DocumentController extends Controller
 {
+    
+    
+    public function __construct()
+    {
+        $this->middleware('auth:sanctum');
+        $this->middleware('role:admin')->except(['index', 'show']);
+    }
     // Get all documents
     public function index()
     {

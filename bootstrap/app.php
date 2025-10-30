@@ -14,18 +14,21 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+         //$middleware->cors();
         // Enable stateful API support for Sanctum (cookies + tokens)
         $middleware->statefulApi();
 
         // 🔒 Add Sanctum's authentication middleware to the API group
         $middleware->group('api', [
             EnsureFrontendRequestsAreStateful::class,
+             \Illuminate\Http\Middleware\HandleCors::class,
+            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ]);
 
         // ✅ Register custom middleware aliases
         $middleware->alias([
-            'role' => CheckRole::class,
+             'role' => CheckRole::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

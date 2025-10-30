@@ -8,6 +8,11 @@ use App\Models\Official;
 
 class OfficialController extends Controller
 {
+        public function __construct()
+        {
+            $this->middleware('auth:sanctum');
+            $this->middleware('role:admin')->except(['index', 'show']);
+        }
     // List all officials
     public function index()
     {

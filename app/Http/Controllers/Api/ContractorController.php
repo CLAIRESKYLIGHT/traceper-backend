@@ -8,6 +8,12 @@ use App\Models\Contractor;
 
 class ContractorController extends Controller
 {
+    
+    public function __construct()
+    {
+        $this->middleware('auth:sanctum');
+        $this->middleware('role:admin')->except(['index', 'show']);
+    }
     // Get all contractors
     public function index()
     {

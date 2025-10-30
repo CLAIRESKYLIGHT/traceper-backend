@@ -31,11 +31,17 @@ Route::middleware('auth:sanctum')->group(function () {
     // Projects
     Route::apiResource('projects', ProjectController::class);
     Route::post('/projects', [ProjectController::class, 'store']);
+    Route::put('/projects/{id}', [ProjectController::class, 'update']);
 
     // Transactions
     Route::apiResource('transactions', TransactionController::class);
     Route::apiResource('documents', DocumentController::class);
     Route::post('/documents', [DocumentController::class, 'store']);
+
+     //Route::get('/dashboard/stats', [DashboardController::class, 'stats']);
+
+     Route::get('/dashboard/stats', [\App\Http\Controllers\Api\DashboardController::class, 'stats']);
+
 
 });
 

@@ -8,6 +8,12 @@ use App\Models\Barangay;
 
 class BarangayController extends Controller
 {
+    
+    public function __construct()
+    {
+        $this->middleware('auth:sanctum');
+        $this->middleware('role:admin')->except(['index', 'show']);
+    }
     // List all barangays
     public function index()
     {

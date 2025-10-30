@@ -8,6 +8,12 @@ use App\Models\Project;
 
 class ProjectController extends Controller
 {
+
+        public function __construct()
+        {
+            $this->middleware('auth:sanctum');
+            $this->middleware('role:admin')->except(['index', 'show']);
+        }
     // Get all projects with relations
         public function index()
         {

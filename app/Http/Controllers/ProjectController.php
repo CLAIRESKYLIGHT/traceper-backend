@@ -53,25 +53,30 @@ class ProjectController extends Controller
     /**
      * Update the specified project.
      */
-    public function update(Request $request, Project $project)
+    public function update(Request $request, $id)
     {
-        $validated = $request->validate([
-            'title' => 'sometimes|required|string|max:255',
-            'description' => 'sometimes|required|string',
-            'budget_allocated' => 'sometimes|required|numeric|min:1',
-            'amount_spent' => 'nullable|numeric|min:0',
-            'status' => 'sometimes|required|string|in:Not Started,In Progress,Completed,Delayed,Cancelled',
-            'start_date' => 'nullable|date',
-            'estimated_completion_date' => 'nullable|date',
-            'actual_completion_date' => 'nullable|date',
-        ]);
+    $project = Project::findOrFail($id);
 
-        $project->update($validated);
+    $validated = $request->validate([
+        'title' => 'sometimes|string|max:255',
+        'description' => 'nullable|string',
+        'barangay_id' => 'nullable|exists:barangays,id',
+        'contractor_id' => 'nullable|exists:contractors,id',
+        'total_cost' => 'nullable|numeric',
+        'budget_allocated' => 'nullable|numeric',
+        'amount_spent' => 'nullable|numeric',
+        'start_date' => 'nullable|date',
+        'end_date' => 'nullable|date',
+        'objectives' => 'nullable|string',
+        'status' => 'nullable|string',
+    ]);
 
-        return response()->json([
-            'message' => '✅ Project updated successfully!',
-            'data' => $project,
-        ]);
+    $project->update($validated);
+
+    return response()->json([
+        'message' => '✅ Project updated successfully',
+        'data' => $project
+    ]);
     }
 
     /**

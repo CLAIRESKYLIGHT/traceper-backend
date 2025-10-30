@@ -9,6 +9,12 @@ use App\Models\Project;
 
 class TransactionController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:sanctum');
+        $this->middleware('role:admin')->except(['index', 'show']);
+    }
+
     // List all transactions
     public function index()
     {

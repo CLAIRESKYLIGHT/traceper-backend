@@ -10,56 +10,30 @@ class OfficialController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
-    {
-        //
-    }
+{
+    $data = $request->validate([
+        'barangay_id' => 'required|exists:barangays,id',
+        'name' => 'required|string|max:255',
+        'position' => 'required|string|max:255',
+        'term' => 'nullable|string|max:255',
+    ]);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Official $official)
-    {
-        //
-    }
+    $official = Official::create($data);
+    return response()->json($official, 201);
+}
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Official $official)
-    {
-        //
-    }
+public function update(Request $request, $id)
+{
+    $official = Official::findOrFail($id);
+    $official->update($request->only('name', 'position', 'term'));
+    return response()->json($official);
+}
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Official $official)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Official $official)
-    {
-        //
-    }
+public function destroy($id)
+{
+    $official = Official::findOrFail($id);
+    $official->delete();
+    return response()->json(['message' => 'Official deleted successfully']);
+}
 }

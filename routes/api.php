@@ -9,8 +9,9 @@ use App\Http\Controllers\Api\OfficialController;
 use App\Http\Controllers\Api\ContractorController;
 use App\Http\Controllers\Api\TransactionController;
 use App\Http\Controllers\Api\DocumentController;
+
 // 🔓 Public routes
-Route::post('/register', [AuthController::class, 'register']);
+Route::post('/register', [AuthController::class, 'register']); 
 Route::post('/login', [AuthController::class, 'login']);
 
 // 🔐 Protected routes
@@ -20,6 +21,8 @@ Route::middleware('auth:sanctum')->group(function () {
      // Barangays
     Route::apiResource('barangays', BarangayController::class);
     Route::post('/barangays', [BarangayController::class, 'store']);
+    Route::get('/barangays/{id}', [BarangayController::class, 'show']);
+
 
     // Officials
     Route::apiResource('officials', OfficialController::class);

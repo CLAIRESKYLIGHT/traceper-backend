@@ -8,11 +8,13 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('barangays', function (Blueprint $table) {
-            $table->id();
-            $table->string('name')->unique();
-            $table->text('description')->nullable();
-            $table->timestamps();
-        });
+    $table->id();
+    $table->string('name');
+    $table->text('description')->nullable();
+    $table->integer('population')->nullable();
+    $table->string('status')->default('Active');
+    $table->timestamps();
+});
     }
 
     /**

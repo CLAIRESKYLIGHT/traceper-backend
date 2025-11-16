@@ -8,16 +8,13 @@ return new class extends Migration {
     public function up(): void
     {
        Schema::create('officials', function (Blueprint $table) {
-             $table->id();
-            $table->foreignId('barangay_id')->nullable()->constrained()->onDelete('cascade');
-            $table->string('name');
-            $table->string('position');
-             $table->string('contact')->nullable();
-              $table->string('photo')->nullable();
-            $table->enum('type', ['elected', 'appointed']);
-            $table->string('contact_info')->nullable();
-            $table->timestamps();
-        });
+    $table->id();
+    $table->foreignId('barangay_id')->constrained()->onDelete('cascade');
+    $table->string('name');
+    $table->string('position');
+    $table->string('term')->nullable();
+    $table->timestamps();
+});
 
     }
 

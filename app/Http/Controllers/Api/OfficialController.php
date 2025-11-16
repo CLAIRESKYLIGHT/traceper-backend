@@ -29,48 +29,29 @@ class OfficialController extends Controller
 
     // Create new official
     public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'position' => 'required|string|max:255',
-            'type' => 'required|in:elected,appointed',
-            'contact_info' => 'nullable|string|max:255',
-            'barangay_id' => 'nullable|exists:barangays,id',
-        ]);
+{
+    $data = $request->validate([
+        'barangay_id' => 'required|exists:barangays,id',
+        'name' => 'required|string|max:255',
+        'position' => 'required|string|max:255',
+        'term' => 'nullable|string|max:255',
+    ]);
 
-        $official = Official::create($validated);
+    $official = Official::create($data);
+    return response()->json($official, 201);
+}
 
-        return response()->json([
-            'message' => 'Official created successfully.',
-            'data' => $official
-        ], 201);
-    }
+public function update(Request $request, $id)
+{
+    $official = Official::findOrFail($id);
+    $official->update($request->only('name', 'position', 'term'));
+    return response()->json($official);
+}
 
-    // Update existing official
-    public function update(Request $request, $id)
-    {
-        $official = Official::findOrFail($id);
-
-        $validated = $request->validate([
-            'name' => 'sometimes|string|max:255',
-            'position' => 'sometimes|string|max:255',
-            'type' => 'sometimes|in:elected,appointed',
-            'contact_info' => 'nullable|string|max:255',
-            'barangay_id' => 'nullable|exists:barangays,id',
-        ]);
-
-        $official->update($validated);
-
-        return response()->json([
-            'message' => 'Official updated successfully.',
-            'data' => $official
-        ]);
-    }
-
-    // Delete official
-    public function destroy($id)
-    {
-        Official::destroy($id);
-        return response()->json(['message' => 'Official deleted successfully.']);
-    }
+public function destroy($id)
+{
+    $official = Official::findOrFail($id);
+    $official->delete();
+    return response()->json(['message' => 'Official deleted successfully']);
+}
 }

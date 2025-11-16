@@ -7,16 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Official extends Model
 {
-    //
-    use HasFactory;
-
-    protected $fillable = [
-        'barangay_id',
-        'name',
-        'position',
-        'type',
-        'contact_info',
-    ];
+    protected $fillable = ['barangay_id', 'name', 'position', 'term'];
 
     public function barangay()
     {

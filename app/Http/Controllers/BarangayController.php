@@ -11,55 +11,40 @@ class BarangayController extends Controller
      * Display a listing of the resource.
      */
     public function index()
-    {
-        //
-    }
+{
+    return Barangay::withCount(['officials', 'projects'])->get();
+}
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+public function store(Request $request)
+{
+    $data = $request->validate([
+        'name' => 'required|string|max:255',
+        'description' => 'nullable|string',
+        'population' => 'nullable|integer',
+        'status' => 'nullable|string',
+    ]);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+    $barangay = Barangay::create($data);
+    return response()->json($barangay, 201);
+}
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Barangay $barangay)
-    {
-        //
-    }
+public function show($id)
+{
+    $barangay = Barangay::with(['officials', 'projects'])->findOrFail($id);
+    return response()->json($barangay);
+}
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Barangay $barangay)
-    {
-        //
-    }
+public function update(Request $request, $id)
+{
+    $barangay = Barangay::findOrFail($id);
+    $barangay->update($request->only('name', 'description', 'population', 'status'));
+    return response()->json($barangay);
+}
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Barangay $barangay)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Barangay $barangay)
-    {
-        //
-    }
+public function destroy($id)
+{
+    $barangay = Barangay::findOrFail($id);
+    $barangay->delete();
+    return response()->json(['message' => 'Barangay deleted successfully']);
+}
 }

@@ -14,7 +14,7 @@ class DocumentController extends Controller
     public function __construct()
     {
         $this->middleware('auth:sanctum');
-        $this->middleware('role:admin')->except(['index', 'show']);
+        $this->middleware('role:admin')->except(['index', 'show', 'download']);
     }
     // Get all documents
     public function index()
@@ -26,13 +26,29 @@ class DocumentController extends Controller
     // Upload new document
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'project_id' => 'required|exists:projects,id',
+        // Convert empty strings to null for nullable fields and ensure project_id is integer
+        $input = $request->all();
+        
+        // Convert project_id to integer if it's a string
+        if (isset($input['project_id'])) {
+            $input['project_id'] = is_numeric($input['project_id']) ? (int)$input['project_id'] : $input['project_id'];
+        }
+        
+        // Convert empty strings to null for nullable fields
+        $nullableFields = ['type', 'description'];
+        foreach ($nullableFields as $field) {
+            if (isset($input[$field]) && $input[$field] === '') {
+                $input[$field] = null;
+            }
+        }
+
+        $validated = validator($input, [
+            'project_id' => 'required|integer|exists:projects,id',
             'title' => 'required|string|max:255',
             'type' => 'nullable|string|max:255',
             'description' => 'nullable|string',
             'file' => 'required|file|mimes:pdf,doc,docx,jpg,png,jpeg|max:2048',
-        ]);
+        ])->validate();
 
         // Save file to storage/app/public/documents
         $path = $request->file('file')->store('documents', 'public');
@@ -47,15 +63,28 @@ class DocumentController extends Controller
 
         return response()->json([
             'message' => 'Document uploaded successfully.',
-            'data' => $document
+            'data' => $document->load('project')
         ], 201);
     }
 
-    // Download document
+    // Get single document
     public function show($id)
     {
+        $document = Document::with('project')->findOrFail($id);
+        return response()->json($document);
+    }
+
+    // Download document file
+    public function download($id)
+    {
         $document = Document::findOrFail($id);
-        return response()->download(storage_path('app/public/' . $document->file_path));
+        $filePath = storage_path('app/public/' . $document->file_path);
+        
+        if (!file_exists($filePath)) {
+            return response()->json(['message' => 'File not found.'], 404);
+        }
+        
+        return response()->download($filePath);
     }
 
     // Delete document

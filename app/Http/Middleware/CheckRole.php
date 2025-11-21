@@ -9,10 +9,15 @@ class CheckRole
 {
     public function handle(Request $request, Closure $next, $roles)
     {
-        $user = $request->user();
-        $allowed = explode('|', $roles);
+         $user = $request->user();
 
-        if (!$user || !in_array($user->role, $allowed)) {
+        if (!$user) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        $allowed = is_string($roles) ? explode('|', $roles) : (array)$roles;
+
+        if (! in_array($user->role, $allowed)) {
             return response()->json(['message' => 'Forbidden'], 403);
         }
 

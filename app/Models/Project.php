@@ -48,4 +48,16 @@ class Project extends Model
     {
         return $this->hasMany(Transaction::class);
     }
+
+    // Calculate remaining budget
+    public function getRemainingBudgetAttribute()
+    {
+        return $this->budget_allocated - $this->amount_spent;
+    }
+
+    // Get total transactions amount (should match amount_spent)
+    public function getTotalTransactionsAttribute()
+    {
+        return $this->transactions()->sum('amount');
+    }
 }

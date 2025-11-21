@@ -19,7 +19,8 @@ class BarangayController extends Controller
     // Get all barangays
    public function index()
 {
-    return Barangay::withCount(['officials', 'projects'])->get();
+    $barangays = Barangay::withCount(['officials', 'projects'])->get();
+    return response()->json($barangays);
 }
 
 public function store(Request $request)

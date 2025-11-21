@@ -13,4 +13,14 @@ class Official extends Model
     {
         return $this->belongsTo(Barangay::class);
     }
+
+    public function projects()
+    {
+        return $this->belongsToMany(Project::class, 'project_officials');
+    }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
 }

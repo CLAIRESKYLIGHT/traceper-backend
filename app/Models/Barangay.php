@@ -19,4 +19,16 @@ class Barangay extends Model
     {
         return $this->hasMany(Project::class);
     }
+
+    // Get total budget allocated for all projects in this barangay
+    public function getTotalBudgetAllocatedAttribute()
+    {
+        return $this->projects()->sum('budget_allocated');
+    }
+
+    // Get total amount spent for all projects in this barangay
+    public function getTotalAmountSpentAttribute()
+    {
+        return $this->projects()->sum('amount_spent');
+    }
 }

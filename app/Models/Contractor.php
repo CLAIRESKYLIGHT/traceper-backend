@@ -21,4 +21,10 @@ class Contractor extends Model
     {
         return $this->hasMany(Project::class);
     }
+
+    // Calculate total amount received from all projects
+    public function getTotalReceivedAttribute()
+    {
+        return $this->projects()->sum('amount_spent');
+    }
 }

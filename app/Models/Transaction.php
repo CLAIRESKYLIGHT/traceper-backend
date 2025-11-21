@@ -26,4 +26,9 @@ class Transaction extends Model
     {
         return $this->belongsTo(Official::class);
     }
+
+    public function documents()
+    {
+        return $this->hasMany(Document::class);
+    }
 }

@@ -18,14 +18,14 @@ class TransactionController extends Controller
     // List all transactions
     public function index()
     {
-        $transactions = Transaction::with(['project', 'official'])->get();
+        $transactions = Transaction::with(['project', 'official', 'documents'])->get();
         return response()->json($transactions);
     }
 
     // Show one transaction
     public function show($id)
     {
-        $transaction = Transaction::with(['project', 'official'])->findOrFail($id);
+        $transaction = Transaction::with(['project', 'official', 'documents'])->findOrFail($id);
         return response()->json($transaction);
     }
 
@@ -80,7 +80,7 @@ class TransactionController extends Controller
 
         return response()->json([
             'message' => 'Transaction recorded successfully.',
-            'data' => $transaction->load(['project', 'official'])
+            'data' => $transaction->load(['project', 'official', 'documents'])
         ], 201);
     }
 
@@ -125,7 +125,7 @@ class TransactionController extends Controller
 
         return response()->json([
             'message' => 'Transaction updated successfully.',
-            'data' => $transaction->load(['project', 'official'])
+            'data' => $transaction->load(['project', 'official', 'documents'])
         ]);
     }
 

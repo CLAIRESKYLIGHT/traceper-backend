@@ -11,6 +11,7 @@ class Document extends Model
 
     protected $fillable = [
         'project_id',
+        'transaction_id',
         'title',
         'file_path',
         'type',
@@ -20,5 +21,10 @@ class Document extends Model
     public function project()
     {
         return $this->belongsTo(Project::class);
+    }
+
+    public function transaction()
+    {
+        return $this->belongsTo(Transaction::class);
     }
 }

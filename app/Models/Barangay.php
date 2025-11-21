@@ -31,4 +31,9 @@ class Barangay extends Model
     {
         return $this->projects()->sum('amount_spent');
     }
+
+    public function iraShares()
+    {
+        return $this->hasMany(BarangayIraShare::class);
+    }
 }

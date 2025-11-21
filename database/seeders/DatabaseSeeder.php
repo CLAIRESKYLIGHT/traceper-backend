@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             MatnogContractorSeeder::class,    // Creates contractors
             MatnogOfficialSeeder::class,      // Creates officials (depends on barangays)
             MatnogProjectSeeder::class,       // Creates projects (depends on barangays, contractors, officials)
+            MatnogFinancialSeeder::class,     // Creates financial records and barangay IRA shares
         ]);
     }
 }

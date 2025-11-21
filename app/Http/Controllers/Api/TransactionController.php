@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Transaction;
 use App\Models\Project;
+use App\Models\Document;
 
 class TransactionController extends Controller
 {
@@ -78,8 +79,32 @@ class TransactionController extends Controller
             $project->increment('amount_spent', $validated['amount']);
         }
 
+        // Automatically create a document entry for this transaction
+        // This ensures every transaction has a document placeholder ready for file upload
+        $project = Project::find($validated['project_id']);
+        $official = $transaction->official;
+        
+        $documentTitle = $validated['description'] 
+            ? "Transaction Document - {$validated['description']}"
+            : "Transaction Document - ₱" . number_format($validated['amount'], 2) . " - " . $validated['transaction_date'];
+        
+        $documentDescription = "Transaction #{$transaction->id} for Project: " . ($project->title ?? 'N/A') . "\n" .
+            "Amount: ₱" . number_format($validated['amount'], 2) . "\n" .
+            ($validated['description'] ? "Description: {$validated['description']}\n" : '') .
+            ($official ? "Authorized by: {$official->name} ({$official->position})\n" : '') .
+            "Date: {$validated['transaction_date']}";
+
+        Document::create([
+            'project_id' => $validated['project_id'],
+            'transaction_id' => $transaction->id,
+            'title' => $documentTitle,
+            'type' => 'receipt', // Default type, can be changed when file is uploaded
+            'description' => $documentDescription,
+            'file_path' => null, // Null until file is uploaded
+        ]);
+
         return response()->json([
-            'message' => 'Transaction recorded successfully.',
+            'message' => 'Transaction recorded successfully. Document placeholder created.',
             'data' => $transaction->load(['project', 'official', 'documents'])
         ], 201);
     }

@@ -67,6 +67,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Documents CRUD
         Route::post('/documents', [DocumentController::class, 'store']);
+        Route::put('/documents/{id}', [DocumentController::class, 'update']);
         Route::delete('/documents/{id}', [DocumentController::class, 'destroy']);
     });
 

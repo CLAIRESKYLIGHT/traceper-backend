@@ -9,6 +9,8 @@ use App\Http\Controllers\Api\ContractorController;
 use App\Http\Controllers\Api\TransactionController;
 use App\Http\Controllers\Api\DocumentController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\FinancialRecordController;
+use App\Http\Controllers\Api\BarangayIraShareController;
 
 // 🔓 Public routes
 Route::post('/register', [AuthController::class, 'register']); 
@@ -33,6 +35,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/documents', [DocumentController::class, 'index']);
     Route::get('/documents/{id}', [DocumentController::class, 'show']);
     Route::get('/documents/{id}/download', [DocumentController::class, 'download']);
+    
+    // Financial records (read-only for citizens)
+    Route::get('/financial-records', [FinancialRecordController::class, 'index']);
+    Route::get('/financial-records/{id}', [FinancialRecordController::class, 'show']);
+    Route::get('/financial-records/year/{year}', [FinancialRecordController::class, 'getByYear']);
+    
+    // Barangay IRA shares (read-only for citizens)
+    Route::get('/barangay-ira-shares', [BarangayIraShareController::class, 'index']);
+    Route::get('/barangay-ira-shares/{id}', [BarangayIraShareController::class, 'show']);
     
     // Dashboard statistics (accessible to all authenticated users)
     Route::get('/dashboard', [DashboardController::class, 'stats']);
@@ -69,6 +80,16 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/documents', [DocumentController::class, 'store']);
         Route::put('/documents/{id}', [DocumentController::class, 'update']);
         Route::delete('/documents/{id}', [DocumentController::class, 'destroy']);
+
+        // Financial Records CRUD
+        Route::post('/financial-records', [FinancialRecordController::class, 'store']);
+        Route::put('/financial-records/{id}', [FinancialRecordController::class, 'update']);
+        Route::delete('/financial-records/{id}', [FinancialRecordController::class, 'destroy']);
+
+        // Barangay IRA Shares CRUD
+        Route::post('/barangay-ira-shares', [BarangayIraShareController::class, 'store']);
+        Route::put('/barangay-ira-shares/{id}', [BarangayIraShareController::class, 'update']);
+        Route::delete('/barangay-ira-shares/{id}', [BarangayIraShareController::class, 'destroy']);
     });
 
     // If you want staff to have some privileges (e.g., create transactions),

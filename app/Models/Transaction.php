@@ -15,6 +15,7 @@ class Transaction extends Model
         'transaction_date',
         'description',
         'amount',
+        'type',
     ];
 
     public function project()

@@ -17,9 +17,26 @@ class BarangayController extends Controller
     }
 
     // Get all barangays
-   public function index()
+   public function index(Request $request)
 {
-    $barangays = Barangay::withCount(['officials', 'projects'])->get();
+    $query = Barangay::withCount(['officials', 'projects']);
+    
+    // Optionally filter by year for IRA shares
+    $year = $request->input('year', date('Y'));
+    
+    $barangays = $query->get()->map(function ($barangay) use ($year) {
+        // Get current year IRA share
+        $currentIraShare = $barangay->iraShares()
+            ->where('year', $year)
+            ->first();
+        
+        $barangayData = $barangay->toArray();
+        $barangayData['current_ira_share'] = $currentIraShare ? (float) $currentIraShare->ira_share : null;
+        $barangayData['ira_share_year'] = $currentIraShare ? $currentIraShare->year : null;
+        
+        return $barangayData;
+    });
+    
     return response()->json($barangays);
 }
 
@@ -36,10 +53,51 @@ public function store(Request $request)
     return response()->json($barangay, 201);
 }
 
-public function show($id)
+public function show($id, Request $request)
 {
     $barangay = Barangay::with(['officials', 'projects'])->findOrFail($id);
-    return response()->json($barangay);
+    
+    // Get all IRA shares for this barangay
+    $iraShares = $barangay->iraShares()->orderBy('year', 'desc')->get();
+    
+    // Get current year (or specified year) IRA share
+    $year = $request->input('year', date('Y'));
+    $currentIraShare = $iraShares->where('year', $year)->first();
+    
+    // Calculate totals
+    $totalBudgetAllocated = $barangay->projects()->sum('budget_allocated');
+    $totalAmountSpent = $barangay->projects()->sum('amount_spent');
+    
+    $response = [
+        'id' => $barangay->id,
+        'name' => $barangay->name,
+        'description' => $barangay->description,
+        'population' => $barangay->population,
+        'status' => $barangay->status,
+        'officials_count' => $barangay->officials()->count(),
+        'projects_count' => $barangay->projects()->count(),
+        'officials' => $barangay->officials,
+        'projects' => $barangay->projects,
+        'financial_summary' => [
+            'total_budget_allocated' => (float) $totalBudgetAllocated,
+            'total_amount_spent' => (float) $totalAmountSpent,
+            'remaining_budget' => (float) ($totalBudgetAllocated - $totalAmountSpent),
+        ],
+        'ira_shares' => $iraShares->map(function ($share) {
+            return [
+                'year' => $share->year,
+                'ira_share' => (float) $share->ira_share,
+                'notes' => $share->notes,
+            ];
+        }),
+        'current_ira_share' => $currentIraShare ? [
+            'year' => $currentIraShare->year,
+            'ira_share' => (float) $currentIraShare->ira_share,
+            'notes' => $currentIraShare->notes,
+        ] : null,
+    ];
+    
+    return response()->json($response);
 }
 
 public function update(Request $request, $id)

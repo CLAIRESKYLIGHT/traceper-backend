@@ -15,6 +15,11 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             AdminUserSeeder::class,
+            // Matnog Municipality Data
+            MatnogBarangaySeeder::class,      // Must be first - creates 40 barangays
+            MatnogContractorSeeder::class,    // Creates contractors
+            MatnogOfficialSeeder::class,      // Creates officials (depends on barangays)
+            MatnogProjectSeeder::class,       // Creates projects (depends on barangays, contractors, officials)
         ]);
     }
 }

@@ -163,6 +163,33 @@ After the first deployment, you need to run migrations:
 - Check database permissions in your database provider (Render or Railway)
 - Ensure database user has proper permissions
 
+### Auto-Deploy Not Working
+If Render is not automatically deploying after you push commits:
+
+1. **Check Auto-Deploy Settings**:
+   - Go to your service → Settings
+   - Find "Auto-Deploy" section
+   - Make sure it's **enabled** (toggle ON)
+   - Verify the **Branch** matches your push branch (usually `main`)
+
+2. **Check Webhook**:
+   - In service Settings → Webhooks section
+   - Verify webhook URL exists
+   - Check GitHub repository → Settings → Webhooks for webhook status
+
+3. **Manual Deploy** (Quick Fix):
+   - Go to your service dashboard
+   - Click **"Manual Deploy"** button
+   - Select your branch and commit
+   - Click **"Deploy"**
+
+4. **Reconnect Repository** (if needed):
+   - Service Settings → Repository
+   - Disconnect and reconnect your GitHub repository
+   - This will refresh the webhook
+
+See [RENDER_TROUBLESHOOTING.md](./RENDER_TROUBLESHOOTING.md) for more detailed troubleshooting steps.
+
 ## Environment Variables Reference
 
 Required variables for production:

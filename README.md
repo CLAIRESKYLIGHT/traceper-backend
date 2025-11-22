@@ -7,6 +7,21 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+## Deployment
+
+This application is configured for deployment on **Render** with a **Railway** PostgreSQL database.
+
+### Quick Start
+
+1. **Set up Railway Database**: Create a PostgreSQL database in Railway and copy the connection credentials
+2. **Deploy to Render**: Connect your GitHub repository to Render and use the `render.yaml` configuration
+3. **Configure Environment Variables**: Add your Railway database credentials and other required variables in Render
+4. **Run Migrations**: After first deployment, run `php artisan migrate --force` in Render's shell
+
+📖 **Full deployment guide**: See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions.
+
+---
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:

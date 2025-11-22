@@ -1,14 +1,36 @@
-# Deployment Guide: Render + Railway
+# Deployment Guide: Render
 
-This guide will help you deploy your Laravel application to Render with a Railway PostgreSQL database.
+This guide will help you deploy your Laravel application to Render with a PostgreSQL database.
 
 ## Prerequisites
 
 1. GitHub account with your code pushed to a repository
 2. Render account (sign up at https://render.com)
-3. Railway account (sign up at https://railway.app)
 
-## Step 1: Set up Railway Database
+## Step 1: Set up Database
+
+You can use either Render's PostgreSQL database (recommended - simpler) or Railway's database.
+
+### Option A: Render PostgreSQL Database (Recommended)
+
+1. Go to [Render Dashboard](https://dashboard.render.com)
+2. Click "New" → "PostgreSQL"
+3. Configure the database:
+   - **Name**: traceper-db (or your preferred name)
+   - **Database**: Leave as default or choose a name
+   - **User**: Leave as default or choose a username
+   - **Region**: Choose closest to your web service
+   - **Plan**: Choose Free or Starter (Free has limitations)
+4. Click "Create Database"
+5. Wait for the database to be provisioned
+6. Once created, you'll see the connection details:
+   - **Internal Database URL** (for services in same region)
+   - **External Database URL** (for external connections)
+   - Individual connection fields are also available
+
+**Note**: Render provides connection details automatically. You can use the `DATABASE_URL` environment variable or individual `DB_*` variables.
+
+### Option B: Railway PostgreSQL Database
 
 1. Go to [Railway Dashboard](https://railway.app/dashboard)
 2. Click "New Project"
@@ -30,18 +52,48 @@ This guide will help you deploy your Laravel application to Render with a Railwa
 3. Connect your GitHub repository
 4. Configure the service:
    - **Name**: traceper-laravel (or your preferred name)
-   - **Environment**: PHP
-   - **Build Command**: 
+   - **Environment**: 
+     - **First choice**: Look for **"PHP"** in the dropdown
+     - **If PHP not available**: Choose **"Docker"** 
+     - **If neither available**: Choose **"Other"** or **"Custom"** and configure manually
+     - **❌ DO NOT choose "Node"** - This is a PHP application, Node is only used for building assets
+   - **Build Command** (if PHP is selected): 
      ```bash
      composer install --no-dev --optimize-autoloader && npm ci && npm run build && php artisan config:cache && php artisan route:cache && php artisan view:cache && php artisan storage:link
      ```
-   - **Start Command**: 
+   - **Start Command** (if PHP is selected): 
      ```bash
      php artisan serve --host=0.0.0.0 --port=$PORT
      ```
    - **Plan**: Choose Free or Starter (Free has limitations)
 
+**Important Notes:**
+- If you see **"PHP"** as an option, select it - this is the correct choice
+- If you see **"Docker"**, select it and Render should auto-detect the `render.yaml` file
+- **Never select "Node"** - Node.js is only used during the build process to compile frontend assets (Vite), but the application itself runs on PHP
+- The `render.yaml` file will help auto-configure if Render supports it
+
 5. Add Environment Variables:
+
+   **If using Render Database (Option A):**
+   - `APP_ENV` = `production`
+   - `APP_DEBUG` = `false`
+   - `APP_KEY` = (Generate with: `php artisan key:generate --show`)
+   - `APP_URL` = `https://your-app-name.onrender.com` (update after first deploy)
+   - `DATABASE_URL` = (Copy from Render database dashboard - Internal Database URL)
+   - OR use individual variables:
+     - `DB_CONNECTION` = `pgsql`
+     - `DB_HOST` = (from Render database)
+     - `DB_PORT` = `5432`
+     - `DB_DATABASE` = (from Render database)
+     - `DB_USERNAME` = (from Render database)
+     - `DB_PASSWORD` = (from Render database)
+   - `LOG_LEVEL` = `error`
+   - `CACHE_DRIVER` = `file`
+   - `SESSION_DRIVER` = `database`
+   - `QUEUE_CONNECTION` = `sync`
+
+   **If using Railway Database (Option B):**
    - `APP_ENV` = `production`
    - `APP_DEBUG` = `false`
    - `APP_KEY` = (Generate with: `php artisan key:generate --show`)
@@ -91,9 +143,11 @@ After the first deployment, you need to run migrations:
 ## Troubleshooting
 
 ### Database Connection Issues
-- Verify all Railway database credentials are correct
-- Check if Railway database is running
+- **Render Database**: Verify `DATABASE_URL` or individual `DB_*` variables are correct
+- **Railway Database**: Verify all Railway database credentials are correct
+- Check if database is running in the respective dashboard
 - Ensure `DB_CONNECTION=pgsql` is set
+- For Render database, make sure you're using the **Internal Database URL** if both services are in the same region
 
 ### Build Failures
 - Check build logs in Render dashboard
@@ -106,11 +160,30 @@ After the first deployment, you need to run migrations:
 
 ### Migration Issues
 - Run migrations manually in Render shell
-- Check database permissions in Railway
+- Check database permissions in your database provider (Render or Railway)
+- Ensure database user has proper permissions
 
 ## Environment Variables Reference
 
 Required variables for production:
+
+**Using Render Database:**
+```
+APP_ENV=production
+APP_DEBUG=false
+APP_KEY=base64:... (generate with php artisan key:generate)
+APP_URL=https://your-app.onrender.com
+DATABASE_URL=postgresql://user:password@host:5432/database
+# OR use individual variables:
+DB_CONNECTION=pgsql
+DB_HOST=your-render-db-host
+DB_PORT=5432
+DB_DATABASE=your-database-name
+DB_USERNAME=your-username
+DB_PASSWORD=your-password
+```
+
+**Using Railway Database:**
 ```
 APP_ENV=production
 APP_DEBUG=false
@@ -126,8 +199,11 @@ DB_PASSWORD=your-password
 
 ## Notes
 
-- Render free tier spins down after 15 minutes of inactivity
-- Railway free tier has usage limits
+- **Render free tier**: 
+  - Web services spin down after 15 minutes of inactivity
+  - PostgreSQL databases on free tier have usage limits (90 days retention, 1GB storage)
+- **Railway free tier**: Has usage limits
+- **Recommendation**: Using Render for both web service and database is simpler and keeps everything in one place
 - Consider upgrading for production use
 - Always keep your `.env` file secure and never commit it
 

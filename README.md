@@ -9,16 +9,18 @@
 
 ## Deployment
 
-This application is configured for deployment on **Render** with a **Railway** PostgreSQL database.
+This application is configured for deployment on **Render** with a PostgreSQL database.
 
 ### Quick Start
 
-1. **Set up Railway Database**: Create a PostgreSQL database in Railway and copy the connection credentials
+1. **Set up Database**: Create a PostgreSQL database (Render recommended, or Railway)
 2. **Deploy to Render**: Connect your GitHub repository to Render and use the `render.yaml` configuration
-3. **Configure Environment Variables**: Add your Railway database credentials and other required variables in Render
+3. **Configure Environment Variables**: Add your database credentials and other required variables in Render
 4. **Run Migrations**: After first deployment, run `php artisan migrate --force` in Render's shell
 
 📖 **Full deployment guide**: See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions.
+
+**Note**: Using Render for both the web service and database is recommended as it keeps everything in one place and simplifies configuration.
 
 ---
 

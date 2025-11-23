@@ -36,7 +36,7 @@ RUN chmod -R 755 /var/www/html/storage \
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
 # Install Node dependencies and build assets
-RUN npm ci && npm run build
+RUN npm install && npm run build
 
 # Create storage link
 RUN php artisan storage:link || true

@@ -16,21 +16,32 @@ class MatnogOfficialSeeder extends Seeder
         // Municipal-level officials (no barangay_id)
         $municipalOfficials = [
             [
-                'name' => 'Hon. Mayor',
+                'name' => 'Bobet Lee Rodrigueza',
                 'position' => 'Municipal Mayor',
                 'term' => '2022-2025',
             ],
             [
-                'name' => 'Hon. Vice Mayor',
+                'name' => 'Jay Ubaldo',
                 'position' => 'Vice Mayor',
                 'term' => '2022-2025',
             ],
         ];
 
         // Add 8 Municipal Councilors
-        for ($i = 1; $i <= 8; $i++) {
+        $councilors = [
+            'Cecil Ubaldo',
+            'Mondoy Garay',
+            'Epoy Barlin',
+            'Mercy Gata',
+            'Atorni Junnar Garcia',
+            'Mac-Mac Ubaldo Bilazon',
+            'Pobie Sabado',
+            'Alan Gacis',
+        ];
+
+        foreach ($councilors as $councilorName) {
             $municipalOfficials[] = [
-                'name' => "Hon. Councilor {$i}",
+                'name' => $councilorName,
                 'position' => 'Municipal Councilor',
                 'term' => '2022-2025',
             ];

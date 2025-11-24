@@ -14,16 +14,14 @@ class ContractorController extends Controller
         $this->middleware('auth:sanctum');
         $this->middleware('role:admin')->except(['index', 'show']);
     }
-
     // Get all contractors
     public function index()
     {
-        // Load contractors with their projects and transactions
+        // Get all contractors first
         $contractors = Contractor::with(['projects.transactions'])->get();
-        
+
         // Calculate total_received for each contractor
         $contractors->transform(function($contractor) {
-            // Sum all expense transactions from all projects
             $totalReceived = $contractor->projects->sum(function($project) {
                 return $project->transactions
                     ->filter(function($transaction) {
@@ -34,20 +32,16 @@ class ContractorController extends Controller
                     ->sum('amount');
             });
             
-            // Add total_received to contractor data
             $contractor->total_received = (float) $totalReceived;
-            
             return $contractor;
         });
 
-        // Return in the format expected by frontend: { data: [...] }
         return response()->json(['data' => $contractors]);
     }
 
     // Get one contractor
     public function show($id)
     {
-        // Load contractor with projects and transactions
         $contractor = Contractor::with(['projects.transactions'])->findOrFail($id);
         
         // Calculate total_received from expense transactions
@@ -61,10 +55,8 @@ class ContractorController extends Controller
                 ->sum('amount');
         });
         
-        // Add total_received to contractor data
         $contractor->total_received = (float) $totalReceived;
-        
-        // Return in the format expected by frontend: { data: {...} }
+
         return response()->json(['data' => $contractor]);
     }
 

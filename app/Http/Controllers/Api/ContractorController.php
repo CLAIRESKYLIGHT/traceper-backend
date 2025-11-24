@@ -14,6 +14,7 @@ class ContractorController extends Controller
         $this->middleware('auth:sanctum');
         $this->middleware('role:admin')->except(['index', 'show']);
     }
+
     // Get all contractors
     public function index()
     {

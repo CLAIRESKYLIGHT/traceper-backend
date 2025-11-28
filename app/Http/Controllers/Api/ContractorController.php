@@ -22,7 +22,10 @@ class ContractorController extends Controller
 
         // Calculate total_received for each contractor
         $contractors->transform(function($contractor) {
-            $totalReceived = $contractor->projects->sum(function($project) {
+            $totalReceived = $contractor->projects ? $contractor->projects->sum(function($project) {
+                if (!$project->transactions) {
+                    return 0;
+                }
                 return $project->transactions
                     ->filter(function($transaction) {
                         // Include expense transactions (case-insensitive) or null (defaults to expense)
@@ -30,7 +33,7 @@ class ContractorController extends Controller
                         return $type === 'expense';
                     })
                     ->sum('amount');
-            });
+            }) : 0;
             
             $contractor->total_received = (float) $totalReceived;
             return $contractor;
@@ -45,7 +48,10 @@ class ContractorController extends Controller
         $contractor = Contractor::with(['projects.transactions'])->findOrFail($id);
         
         // Calculate total_received from expense transactions
-        $totalReceived = $contractor->projects->sum(function($project) {
+        $totalReceived = $contractor->projects ? $contractor->projects->sum(function($project) {
+            if (!$project->transactions) {
+                return 0;
+            }
             return $project->transactions
                 ->filter(function($transaction) {
                     // Include expense transactions (case-insensitive) or null (defaults to expense)
@@ -53,7 +59,7 @@ class ContractorController extends Controller
                     return $type === 'expense';
                 })
                 ->sum('amount');
-        });
+        }) : 0;
         
         $contractor->total_received = (float) $totalReceived;
 

@@ -13,7 +13,15 @@ return new class extends Migration
     {
         Schema::table('documents', function (Blueprint $table) {
             // Make file_path nullable to allow placeholder documents
-            \Illuminate\Support\Facades\DB::statement('ALTER TABLE `documents` MODIFY `file_path` VARCHAR(255) NULL');
+            $driver = Schema::getConnection()->getDriverName();
+
+            if ($driver === 'pgsql') {
+                \Illuminate\Support\Facades\DB::statement('ALTER TABLE documents ALTER COLUMN file_path DROP NOT NULL');
+            } elseif ($driver === 'mysql' || $driver === 'mariadb') {
+                \Illuminate\Support\Facades.DB::statement('ALTER TABLE documents MODIFY file_path VARCHAR(255) NULL');
+            } else {
+                $table->string('file_path', 255)->nullable()->change();
+            }
         });
     }
 
@@ -24,7 +32,15 @@ return new class extends Migration
     {
         Schema::table('documents', function (Blueprint $table) {
             // Make file_path required again (only if all documents have files)
-            \Illuminate\Support\Facades\DB::statement('ALTER TABLE `documents` MODIFY `file_path` VARCHAR(255) NOT NULL');
+            $driver = Schema::getConnection()->getDriverName();
+
+            if ($driver === 'pgsql') {
+                \Illuminate\Support\Facades\DB::statement('ALTER TABLE documents ALTER COLUMN file_path SET NOT NULL');
+            } elseif ($driver === 'mysql' || $driver === 'mariadb') {
+                \Illuminate\Support\Facades\DB::statement('ALTER TABLE documents MODIFY file_path VARCHAR(255) NOT NULL');
+            } else {
+                $table->string('file_path', 255)->nullable(false)->change();
+            }
         });
     }
 };

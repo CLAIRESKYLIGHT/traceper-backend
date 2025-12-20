@@ -16,8 +16,20 @@ return new class extends Migration
             $table->dropForeign(['barangay_id']);
         });
 
-        // Use DB facade to modify the column (required for changing foreign key columns)
-        \Illuminate\Support\Facades\DB::statement('ALTER TABLE `officials` MODIFY `barangay_id` BIGINT UNSIGNED NULL');
+        $driver = Schema::getConnection()->getDriverName();
+
+        if ($driver === 'pgsql') {
+            // PostgreSQL syntax
+            \Illuminate\Support\Facades\DB::statement('ALTER TABLE officials ALTER COLUMN barangay_id DROP NOT NULL');
+        } elseif ($driver === 'mysql' || $driver === 'mariadb') {
+            // MySQL / MariaDB syntax
+            \Illuminate\Support\Facades\DB::statement('ALTER TABLE officials MODIFY barangay_id BIGINT UNSIGNED NULL');
+        } else {
+            // Fallback for other drivers
+            Schema::table('officials', function (Blueprint $table) {
+                $table->unsignedBigInteger('barangay_id')->nullable()->change();
+            });
+        }
 
         Schema::table('officials', function (Blueprint $table) {
             // Re-add the foreign key constraint
@@ -35,8 +47,17 @@ return new class extends Migration
             $table->dropForeign(['barangay_id']);
         });
 
-        // Use DB facade to modify the column back to NOT NULL
-        \Illuminate\Support\Facades\DB::statement('ALTER TABLE `officials` MODIFY `barangay_id` BIGINT UNSIGNED NOT NULL');
+        $driver = Schema::getConnection()->getDriverName();
+
+        if ($driver === 'pgsql') {
+            \Illuminate\Support\Facades\DB::statement('ALTER TABLE officials ALTER COLUMN barangay_id SET NOT NULL');
+        } elseif ($driver === 'mysql' || $driver === 'mariadb') {
+            \Illuminate\Support\Facades\DB::statement('ALTER TABLE officials MODIFY barangay_id BIGINT UNSIGNED NOT NULL');
+        } else {
+            Schema::table('officials', function (Blueprint $table) {
+                $table->unsignedBigInteger('barangay_id')->nullable(false)->change();
+            });
+        }
 
         Schema::table('officials', function (Blueprint $table) {
             // Re-add the foreign key constraint

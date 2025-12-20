@@ -16,8 +16,20 @@ return new class extends Migration
             $table->dropForeign(['project_id']);
         });
 
-        // Make project_id nullable (documents can be transaction-specific)
-        \Illuminate\Support\Facades\DB::statement('ALTER TABLE `documents` MODIFY `project_id` BIGINT UNSIGNED NULL');
+        $driver = Schema::getConnection()->getDriverName();
+
+        if ($driver === 'pgsql') {
+            // PostgreSQL syntax to allow nulls
+            \Illuminate\Support\Facades\DB::statement('ALTER TABLE documents ALTER COLUMN project_id DROP NOT NULL');
+        } elseif ($driver === 'mysql' || $driver === 'mariadb') {
+            // MySQL / MariaDB syntax
+            \Illuminate\Support\Facades\DB::statement('ALTER TABLE documents MODIFY project_id BIGINT UNSIGNED NULL');
+        } else {
+            // Fallback for other drivers
+            Schema::table('documents', function (Blueprint $table) {
+                $table->unsignedBigInteger('project_id')->nullable()->change();
+            });
+        }
 
         Schema::table('documents', function (Blueprint $table) {
             // Re-add foreign key constraint (nullable)
@@ -46,8 +58,17 @@ return new class extends Migration
             $table->dropForeign(['project_id']);
         });
 
-        // Make project_id required again
-        \Illuminate\Support\Facades\DB::statement('ALTER TABLE `documents` MODIFY `project_id` BIGINT UNSIGNED NOT NULL');
+        $driver = Schema::getConnection()->getDriverName();
+
+        if ($driver === 'pgsql') {
+            \Illuminate\Support\Facades\DB::statement('ALTER TABLE documents ALTER COLUMN project_id SET NOT NULL');
+        } elseif ($driver === 'mysql' || $driver === 'mariadb') {
+            \Illuminate\Support\Facades\DB::statement('ALTER TABLE documents MODIFY project_id BIGINT UNSIGNED NOT NULL');
+        } else {
+            Schema::table('documents', function (Blueprint $table) {
+                $table->unsignedBigInteger('project_id')->nullable(false)->change();
+            });
+        }
 
         Schema::table('documents', function (Blueprint $table) {
             // Re-add project_id foreign key (required)
